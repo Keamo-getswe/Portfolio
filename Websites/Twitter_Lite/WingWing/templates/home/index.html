@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block left %}
+  <h3><i class="fas fa-hashtag"></i> Trending Topics</h3>
+  {% for tag in trending %}
+  <a href="/hashtags?hashtag={{tag['hashtag']}}" >
+     <i class="fas fa-hashtag"></i>{{ tag['hashtag'] }}
+  </a>
+  <br>
+  {% endfor %}
+  {% if g.user %}
+  <hr>
+  <a href="/profile/network"><button class="btn btn-primary">
+    Visualize Network</button></a>
+  <hr>
+
+    <h3><i class="fas fa-user-friends"></i>People you are following </h3>
+    {% for person in following %}
+    <img class="avatar" src="{{ person['photo'] }}" alt="Card image">
+    <a href="#{{ person['username'] }}" data-toggle="collapse"
+      {% if loop.first %} aria-expanded="true" {% endif %}>
+       @{{ person['username'] }}
+    </a>
+    <br>
+
+    <div id="{{ person['username'] }}" class="collapse" {% if loop.first %} aria-expanded="true" {% endif %}>
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">{{ person['username'] }}</h4>
+        <p class="card-text">{{ person['bio'] }}</p>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-{{ person['username'] }}">
+          View Chirps
+        </button>
+      </div>
+    </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modal-{{ person['username'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title" id="exampleModalLongTitle">Chirps by @{{ person['username'] }}</h3>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            {% for tweet in g.ftweets[person['username']] %}
+            <div class="tweet">
+              <p><strong>{{ tweet['body'] | safe }}</strong></p>
+
+              {% if g.user and tweet['username'] != g.user %}
+              <p><em>by @{{ tweet['username'] }} on {{ tweet['time'] }}</em></p>
+              {% elif g.user %}
+              <p><em>by you on {{ tweet['time'] }}</em></p>
+              {% endif %}
+
+              <ul>
+                <li>{{ tweet['likes'] }}
+                  <i class="far fa-thumbs-up"></i></li>
+                <li>{{ tweet['retweets'] }}
+                  <i class="fas fa-retweet"></i></li>
+              <ul>
+
+              {% if g.user and tweet['username'] != g.user %}
+                <button class="btn btn-primary" onclick="retweet('{{ tweet['id'] }}')">
+                  Rechirp
+                </button>
+                <button class="btn btn-primary" onclick="like('{{ tweet['id'] }}')">
+                  Like
+                </button>
+              {% endif %}
+                <br>
+                <hr>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  {% endif %}
+{% endblock %}
+
+{% block center %}
+
+<h3>Latest Chirps</h3>
+<hr>
+<div class="scrollable">
+  {% for tweet in tweets %}
+  <div class="tweet">
+    <p><strong>{{ tweet['body'] | safe }}</strong></p>
+
+    {% if g.user and tweet['username'] != g.user %}
+    <p><em>by @{{ tweet['username'] }} on {{ tweet['time'] }}</em></p>
+    {% elif g.user %}
+    <p><em>by you on {{ tweet['time'] }}</em></p>
+    {% endif %}
+
+    <ul>
+      <li>{{ tweet['likes'] }}
+        <i class="far fa-thumbs-up"></i></li>
+      <li>{{ tweet['retweets'] }}
+        <i class="fas fa-retweet"></i></li>
+    <ul>
+
+    {% if g.user and tweet['username'] != g.user %}
+      <button class="btn btn-primary" onclick="retweet('{{ tweet['id'] }}')">
+        Rechirp
+      </button>
+      <button class="btn btn-primary" onclick="like('{{ tweet['id'] }}')">
+        Like
+      </button>
+    {% endif %}
+
+      <br>
+      <hr>
+
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block right %}
+  {% if g.user %}
+
+  <h3><i class="fas fa-user-friends"></i>Who to follow</h3>
+    {% for person in suggestions %}
+    <img class="avatar" src="{{ person['photo'] }}" alt="Card image">
+    <a href="#{{ person['username'] }}" data-toggle="collapse">
+       @{{ person['username'] }}
+    </a>
+    <br>
+
+    <div id="{{ person['username'] }}" class="collapse">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">{{ person['username'] }}</h4>
+        <p class="card-text">{{ person['bio'] }}</p>
+        <ul>
+          <li>{{ person['num_likes'] }}
+            <i class="far fa-thumbs-up"></i></li>
+          <li>{{ person['num_tweets'] }}
+            <i class="fas fa-retweet"></i></li>
+        <ul>
+        <a href="#" class="btn btn-primary"
+          onclick="follow('{{ person['username']}}')">Follow</a>
+      </div>
+    </div>
+    </div>
+
+
+    {% endfor %}
+
+  {% else %}
+    <h3><i class="fas fa-angle-double-right"></i> Join Today</h3>
+    <img class="avatar" src = "../static/icons/logo2.jpg">
+    <h4>and stay up to date with the latest news and trends</h4>
+  {% endif %}
+{% endblock %}

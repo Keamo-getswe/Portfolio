@@ -1,0 +1,164 @@
+Author: Ibrahim
+Author: Elwin
+Auther: Reinhardt
+Description: This file was created to hold cypher queries to be used in the 2019 Twitter Lite Web Dev project.
+
+NB: T - means the cypher query was implemented in the project already.
+    W - Query works
+    B - Busy with query, do not use.
+----------------------------------------------------------------------------------------------------------------
+
+T - ADD A NEW USER (Rather use 'create' than 'Merge')
+MERGE (m:User {username:'Elwin', password:'chipmunk', photo:'null' ,bio:'Wing Wing Jokes', Id:'0'}) RETURN m
+MERGE (m:User {username:'Ibra', password:'testing123', photo:'null' ,bio:'Movies and series'}) RETURN m
+
+T - HAVE A USER FOLLOW ANOTHER USER:
+MATCH(a:User), (b:User) WHERE a.username='Jacobie' AND b.username='Elwin' CREATE(a)-[r:FOLLOWS]->(b) RETURN r
+
+T - USER MAKES A TWEET
+MERGE (m:Tweet {username: 'Ibra' , body:'I love soda and there is nothing like a free lunch', time:localdatetime.realtime(), Id: '0'}) RETURN m
+
+T - USER RETWEETS
+MATCH(a:User), (b:Tweet) WHERE a.username='Elwin' AND b.id=22 CREATE(a)-[r:RETWEETED]->(b) RETURN r
+
+Retweet all tweets of a user:
+MATCH(a:User), (b:Tweet) WHERE a.username='Jacobie' AND b.username='Ibra' CREATE(a)-[r:RETWEETED]->(b) RETURN r
+
+DELETE ALL TWEETS
+// add relationship deletions
+MATCH(n:Tweet) DELETE(n)
+
+T - GET 25 TWEETS
+MATCH (n:Tweet) RETURN n LIMIT 25
+
+GET ALL UNIQUE USERNAMES FROM ALL NODES
+MATCH (n) WHERE EXISTS(n.username) RETURN DISTINCT "node" as entity, n.username AS username LIMIT 25 UNION ALL MATCH ()-[r]-() WHERE EXISTS(r.username) RETURN DISTINCT "relationship" AS entity, r.username AS username LIMIT 25
+
+T - GET ALL THE TWEETS OF A USER
+MATCH (n:Tweet) WHERE n.username='Ibra' RETURN n
+
+ADD A PROPERTY TO A NODE
+
+Here we add the total property to the Hashtag type node:
+
+MERGE (n:Hashtag {name: 'wingwing', Id:'0'})
+SET n.total=2
+RETURN n.total
+
+T - GETTING USER PROPERTIES
+
+Get a user's password:
+MATCH(u: User {username: 'Ibra'}) RETURN u.password
+
+Get a user's bio:
+MATCH(u: User {username: 'Ibra'}) RETURN u.bio
+
+Get a user's photo:
+MATCH(u: User {username: 'Ibra'}) RETURN u.photo
+
+GETTING TWEET PROPERTIES
+
+For all of a user's tweets:
+MATCH(u: Tweet {username: 'Ibra'}) RETURN u.body
+
+For a specific tweet by id:
+MATCH(u: Tweet) WHERE id(u)= 60 RETURN u.body
+
+DELETING NODE
+
+match (:Genre {name:"Crime"})-[r:IN_GENRE]-(:Movie) DELETE r
+match (a:Genre) where a.name="Crime" delete a
+
+creating links between nodes
+
+T - ELWIN LIKE'S IBRA'S TWEET
+MATCH (a:User),(b:Tweet) WHERE a.username = "Elwin" AND b.username = "Ibra" CREATE(a)-[r:LIKED]->(b) RETURN r
+
+DIONNE USES HASHTAG IN TWEET
+MATCH (a:Tweet),(b:Hashtag) WHERE a.username="Dionne" AND b.name="wingwing" CREATE (a)-[r:USED_TAG]->(b) RETURN r
+
+GET THE NUMBER OF TOTAL RELATIONSHIPS IN THE GRAPH
+MATCH (n)-[r]->() RETURN COUNT(r)
+
+FIND THE TOTAL NUMBER OF SPECIFIC RELATIONSHIPS
+
+Find the total number of follows:
+MATCH (n)-[r:FOLLOWS]->() RETURN COUNT(r)
+
+Find the total number of liked tweets:
+MATCH (n)-[r:LIKED]->() RETURN COUNT(r)
+
+T - COUNT THE NUMBER OF RETWEETS OF A SPECIFIC USER'S TWEETS
+MATCH (n)-[r:RETWEETED]->(t) WHERE t.username='Ibra' RETURN COUNT(r)
+
+T - COUNT THE NUMBER OF RETWEETS OF A SPECIFIC TWEET
+MATCH (n)-[r:RETWEETED]->(t) WHERE id(t)=22 RETURN COUNT(r)
+
+B - find actor acted in most movies{we must change this}
+MATCH (a)-[:ACTED_IN]->(b)
+RETURN a, COLLECT(b) as authors
+ORDER BY SIZE(authors) desc LIMIT 1
+
+W - return usernames of all Users that liked the Tweet with the username 'Ibra'
+match (a:Tweet {username:'Ibra'})<-[:LIKED]-(User) return User.username
+
+w - Getting the tweet that is most recently liked
+match (:Tweet)<-[r:LIKED]-(:User) with r order by r.time desc limit 1 MATCH (t:Tweet)<-[r:LIKED]-(:User) return t
+
+creates a relationship with the localtime as 'id'.
+MATCH (a:User),(b:Tweet) WHERE a.username = "Dionne" AND b.username = "Ibra" CREATE(a)-[r:LIKED {time:localdatetime.realtime()}]->(b) RETURN r
+
+Get the tweets that user likes
+MATCH (n:User)-[r:LIKED]->(t:Tweet) WHERE n.username='Elwin' RETURN t
+
+Get a users' retweets
+MATCH (n:User)-[r:RETWEETED]->(t:Tweet) WHERE n.username='Elwin' RETURN t
+
+Get a users' number of tweets
+MATCH (u:User {username:"Ibra"})-[r:TWEETED]->(t:Tweet)
+RETURN COUNT((u)-[r]->(t)) as cnt
+
+Get a users' number of retweets
+MATCH (u:User {username:"Elwin"})-[r:RETWEETED]->(t:Tweet)
+RETURN COUNT((u)-[r]->(t)) as cnt
+
+Total likes for a user (sum of likes over all users' tweets)
+MATCH (u:User)-[r:LIKED]->(t:Tweet {username:"Ibra"})
+RETURN COUNT((u)-[r]->(t)) as cnt
+
+Total followers for a given user
+MATCH (u1:User)-[r:FOLLOWS]->(u2:User {username:"Robbie"})
+RETURN COUNT((u1)-[r]->(u2)) as cnt
+
+Number of users a particular user is following
+MATCH (u1:User {username:"Jacobie"})-[r:FOLLOWS]->(u2:User)
+RETURN COUNT((u1)-[r]->(u2)) as cnt
+
+Gets the matching tweet that uses the hashtag
+MATCH (a:Hashtag)<-[r:USED_TAG]-(t:Tweet) where a.name="wingwing" with r,t order by r.time desc
+RETURN t
+
+Get information about followers, following and the number of links
+MATCH (follower:User)-[:FOLLOWS]->(following:User)
+WITH follower,count(following) as rels, collect(following) as followed
+WHERE rels > 1
+RETURN follower,followed, rels
+
+MATCH (follower:User)-[:FOLLOWS]->(following:User)
+WITH follower,count(following) as rels, collect(following) as foll order by rels desc
+WHERE rels > 1
+RETURN follower,foll, rels
+
+Get user that retweet a tweets
+MATCH (n)-[r:RETWEETED]->(t) WHERE t.id='wingwing' RETURN n
+
+DATABASE IMPLEMENTATION ISSUES:
+- Dates need to be added to TWEETS
+- We need to assign ID's by ourself to use in other areas, consider the issue with Ibra's hashtag in the "i love soda tweet"
+- Query testing
+
+OTHER QUERIES TO WRITE:
+- Top 5 most popular hashtags
+- Lastest TWEETS
+- Get my most popular TWEETS
+- Get my LIKED TWEETS

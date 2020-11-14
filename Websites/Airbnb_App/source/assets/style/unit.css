@@ -1,0 +1,324 @@
+* {
+  margin: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+a:link {
+	color: white;
+	text-decoration: none;
+}
+
+nav.topbar a:link {
+	color: black;
+	text-decoration: none;
+}
+
+nav.dropdown a:link {
+	color: white;
+	text-decoration: none;
+}
+
+a:visited {
+	color: white;
+	text-decoration: none;
+}
+
+nav a:visited {
+	text-decoration: none;
+}
+
+a:hover {
+	color: white;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+nav.topbar a:hover {
+	color: white;
+	font-weight: normal;
+	text-decoration: none;
+	background-color: rgba(0, 0, 0, 0.7);
+}
+
+.edit_images img {
+  max-width: 250px;
+  height: auto;
+}
+
+nav.dropdown a:hover {
+  color: white;
+	font-weight: normal;
+	text-decoration: none;
+	background-color: rgba(0, 0, 0, 0.7);
+}
+
+nav.topbar button:hover {
+	color: white;
+  font-weight: normal;
+	text-decoration: none;
+ 	background-color: rgba(0, 0, 0, 0.7);
+}
+
+nav.dropdown button:hover {
+ 	background-color: rgba(0, 0, 0, 0.7);
+}
+
+a button:hover, input[type=submit]:hover,
+    input[type="button"]:hover {
+  border-style: outset;
+}
+
+.dropdown:hover .dropdown_content {
+	display: block;
+}
+
+nav  {
+	position: fixed;
+	z-index: 4;
+	top: 0;
+	left: 0;
+	background-color: transparent;
+	width: 100%;
+}
+
+nav ul {
+	list-style: none;
+}
+
+nav.topbar ul li a {
+	color: black;
+	background: transparent;
+	display: inline;
+	float: right;
+	padding: 12px 30px;
+	text-transform: uppercase;
+	border: none;
+}
+
+nav.topbar ul li button {
+	color: black;
+	background: transparent;
+	display: inline;
+	float: right;
+	padding: 12px 30px;
+	text-transform: uppercase;
+	border: none;
+}
+
+nav.dropdown {
+	visibility: hidden;
+}
+
+a button {
+  background-color: rgb(204, 77, 77);
+  color: white;
+  border-color: white;
+  border-style: solid;
+  padding: 5px;
+  border-radius: 12px;
+}
+
+button {
+  background-color: rgb(204, 77, 77);
+  color: white;
+  border-color: white;
+  border-style: solid;
+  padding: 5px;
+  border-radius: 12px;
+}
+
+body {
+  position: relative;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.Facilities li {
+  list-style: square;
+  list-style-position: outside;
+}
+
+.Facilities {
+  text-align: center;
+  list-style: inside;
+}
+
+h1 {
+  font-size: 2em;
+  text-align: center;
+  margin-top: 100px;
+  color: black;
+}
+
+h2, h3, h4 {
+  font-weight: bold;
+  text-align: center;
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+.Host body.booking h2 {
+  text-decoration: underline;
+}
+
+.Hotel_pics {
+  float: left;
+  width: 25%;
+  %padding: 5px;
+}
+
+.Hotel_pics img {
+  width: 100%;
+  overflow: hidden;
+}
+
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.gmap_canvas iframe {
+  border: none;
+  width: 100%;
+  max-width: 600px;
+  height: 500px;
+}
+
+hr {
+  padding-top: 15px;
+}
+
+.booking {
+  background: url("../images/slide2.jpg") no-repeat center center fixed;
+	background-size: cover;
+	height: 100%;
+	background-attachment: fixed;
+	position: relative;
+}
+
+.bookings_container {
+  background: rgba(250, 250, 250, 0.8);
+	padding: 10px;
+	border-radius: 20px;
+	width: 350px;
+	height: 950px;
+	position: absolute;
+	left: 50%;
+	margin-left: -145px;
+	top: 20%;
+	margin-top: 98px;
+  margin-bottom: 98px;
+}
+
+input[type=text], input[type=email], input[type=password],
+  input[type=date], input[type=number], textarea, select {
+	border: solid;
+	border-color: rgb(204, 77, 77);
+	border-width: 1px;
+	border-radius: 20px;
+	padding: 5px 5px;
+  background: rgba(250, 250, 250, 0);
+}
+
+input[type=submit], input[type="button"] {
+	background-color: rgb(204, 77, 77);
+	color: white;
+	border-color: rgb(204, 77, 77);
+	border-style: solid;
+	padding: 5px;
+	border-radius: 12px;
+}
+table {
+	margin-left: auto;
+	margin-right: auto;
+  border: solid;
+  border-collapse: collapse;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+td, th, tfoot {
+  border: solid;
+  border-width: thin;
+	padding: 0.8em;
+}
+
+.reviews {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+hr {
+  width: 100%;
+
+}
+
+@media screen and (max-width: 550px) {
+  .Hotel_pics {
+    width: 50%;
+  }
+
+}
+
+@media screen and (max-width: 380px) {
+  .Hotel_pics {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 1150px) {
+	nav.topbar {
+		visibility: hidden;
+	}
+
+	nav.dropdown  {
+		visibility: visible;
+		z-index: 3;
+		float: left;
+	}
+
+	nav.dropdown button {
+		color: white;
+		background: rgba(0, 0, 0, 0);
+		display: inline;
+		padding: 12px 30px;
+		border: none;
+	}
+
+  nav.dropdown .dropdown_button {
+	   margin-left: -90%;
+	}
+
+	.dropdown_content {
+		display: none;
+		position: absolute;
+		background-color: rgba(0, 0, 0, 0.7);
+	}
+
+	.dropdown_content a, .dropdown_content button {
+		display: block;
+		padding: 10px 12px;
+		text-align: center;
+	}
+}
+
+.footer {
+  width: 100%;
+  background-color: rgb(204, 77, 77);
+  text-align: center;
+  padding: 0;
+  margin-top: 5%;
+  margin-bottom: 0;
+  margin-right: 0;
+  margin-left: 0;
+}
+
+figure {
+  height: 20%;
+  padding: 0;
+  margin-top: 0%;
+  margin-bottom: 0;
+  margin-right: 0;
+  margin-left: 0;
+}

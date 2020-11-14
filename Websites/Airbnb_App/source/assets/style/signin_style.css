@@ -1,0 +1,107 @@
+* {
+	box-sizing: border-box;
+	font-family: sans-serif;
+}
+
+a:link {
+	color: rgb(204, 77, 77);
+	text-decoration: underline;
+}
+
+nav a:link {
+	color: white;
+	text-decoration: none;
+}
+
+a:visited {
+	color: rgb(204, 77, 77);
+	text-decoration: underline;
+}
+
+nav a:visited {
+	color: white;
+	text-decoration: none;
+}
+
+a:hover {
+	color: rgb(204, 77, 77);
+	font-weight: bold;
+	text-decoration: none;
+}
+
+nav a:hover {
+	color: white;
+	font-weight: normal;
+	text-decoration: none;
+	background-color: rgba(0, 0, 0, 0.7);
+}
+
+button:hover, input[type=submit]:hover {
+	border-color: rgb(204, 77, 77);
+	border-style: outset;
+}
+
+nav ul {
+	list-style: none;
+}
+
+nav ul li a {
+	background: transparent;
+	display: inline;
+	float: right;
+	padding: 12px 30px;
+	text-transform: uppercase;
+}
+
+body {
+	background: url("../images/disa.jpg") no-repeat center center fixed;
+	background-size: cover;
+	height: 100%;
+	background-attachment: fixed;
+	position: relative;
+}
+
+div.container {
+	background: rgba(250, 250, 250, 0.8);
+	padding: 10px;
+	border-radius: 20px;
+	width: 290px;
+	height: auto;
+	position: absolute;
+	left: 50%;
+	margin-left: -145px;
+	top: 20%;
+	margin-top: 98px;
+}
+
+div.text {
+	text-align: center;
+	font-family: sans-serif;
+}
+
+div.visible {
+	display: none;
+}
+
+input[type=text], input[type=email], input[type=password] {
+	border: solid;
+	border-color: rgb(204, 77, 77);
+	border-width: 1px;
+	border-radius: 20px;
+	padding: 5px 5px;
+  background: rgba(250, 250, 250, 0);
+}
+
+button, input[type=submit] {
+	background-color: rgb(204, 77, 77);
+	color: white;
+	border-color: rgb(204, 77, 77);
+	border-style: solid;
+	padding: 5px;
+	border-radius: 12px;
+}
+
+.footer {
+	background: rgb(204, 77, 77);
+	font-size: 0.1em;
+}

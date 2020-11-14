@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block header %}
+
+{% endblock %}
+
+{% block left %}
+<h3><i class="fas fa-user-friends"></i>People Following You</h3>
+{% for person in following %}
+<img src="{{ person['photo'] }}" alt="Card image" class = "avatar">
+<a href="#{{ person['username'] }}" data-toggle="collapse">
+   @{{ person['username'] }}
+</a>
+<br>
+
+<div id="{{ person['username'] }}" class="collapse">
+<div class="card">
+  <div class="card-body">
+    <h4 class="card-title">{{ person['username'] }}</h4>
+    <p class="card-text">{{ person['bio'] }}</p>
+    <a href="#" class="btn btn-primary"
+      onclick="follow('{{ person['username'] }}')">Follow</a>
+  </div>
+</div>
+</div>
+
+{% endfor %}
+<hr>
+
+<h3><i class="fas fa-user-friends"></i>Find people you know </h3>
+  <form method="POST" action="{{ url_for('profile.profile') }}">
+    <input class="form-control mr-sm-2" type="search" placeholder="Search"
+      aria-label="Search" name="search">
+  </form>
+  {% if g.search_result %}
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">
+        <img class="avatar" src="{{ g.search_result['photo'] }}" alt="Card image">
+        @{{ g.search_result['username'] }}
+      </h4>
+      <p class="card-text">{{ g.search_result['bio'] }}</p>
+      <!-- Button trigger modal -->
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-{{ g.search_result['username'] }}">
+        View Chirps
+      </button><br><br>
+      <a href="#" class="btn btn-primary"
+        onclick="follow('{{ g.search_result['username'] }}')">Follow</a>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="modal-{{ g.search_result['username'] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" id="exampleModalLongTitle">Chirps by @{{ g.search_result['username'] }}</h3>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {% for tweet in g.ftweets[g.search_result['username']] %}
+          <div class="tweet">
+            <p><strong>{{ tweet['body'] | safe }}</strong></p>
+
+            {% if g.user and tweet['username'] != g.user %}
+            <p><em>by @{{ tweet['username'] }} on {{ tweet['time'] }}</em></p>
+            {% elif g.user %}
+            <p><em>by you on {{ tweet['time'] }}</em></p>
+            {% endif %}
+
+            <ul>
+              <li>{{ tweet['likes'] }}
+                <i class="far fa-thumbs-up"></i></li>
+              <li>{{ tweet['retweets'] }}
+                <i class="fas fa-retweet"></i></li>
+            <ul>
+
+            {% if g.user and tweet['username'] != g.user %}
+              <button class="btn btn-primary" onclick="retweet('{{ tweet['id'] }}')">
+                Rechirp
+              </button>
+              <button class="btn btn-primary" onclick="like('{{ tweet['id'] }}')">
+                Like
+              </button>
+            {% endif %}
+              <br>
+              <hr>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  <hr>
+{% endblock %}
+
+{% block center %}
+
+  <h3>Chirps</h3>
+  <hr>
+  <div class="scrollable">
+    {% for tweet in tweets %}
+    <div class="tweet">
+      <p><strong>{{ tweet['body'] | safe }}</strong></p>
+      <ul>
+        <li>on {{ tweet['time'] }}</li>
+        <li>{{ tweet['likes'] }}
+          <i class="far fa-thumbs-up"></i></li>
+        <li>{{ tweet['retweets'] }}
+          {% if tweet['retweets'] > 0 %}
+          <a href="#" onclick="display_users_who_retweeted('{{ tweet['id'] }}')">
+            <i class="fas fa-retweet"></i>
+          </a>
+          {% else %}
+            <i class="fas fa-retweet"></i>
+          {% endif %}
+        </li>
+      <ul>
+      <br>
+      <div id="user-retweets-{{ tweet['id'] }}">
+      </div>
+        <br>
+        <hr>
+    </div>
+    {% endfor %}
+  </div>
+
+{% endblock %}
+
+{% block right %}
+
+  <h3> <img src="{{ g.photo }}" alt="profile_pic" class = "avatar">  @{{ g.user }}</h3>
+  <hr>
+  <p>{{ g.bio }}</p>
+    <br><br>
+
+
+    <a href="#change_password" data-toggle="collapse">
+     Change Password
+  </a>
+  <br>
+
+  <div id="change_password" class="collapse">
+  <div class="card">
+    <div class="card-body">
+      <form action="{{ url_for('profile.profile') }}" method="POST">
+        <input type="password" name="new_password_1" class="form-control"
+          placeholder="New password" required><br>
+        <input type="password" name="new_password_2" class="form-control"
+          placeholder="Reenter Password" required><br>
+        <input class="btn btn-primary" type="submit" value="Update">
+      </form>
+    </div>
+  </div>
+  </div>
+
+  <hr>
+
+  <button type="button" class="btn btn-primary" data-toggle="modal"
+    data-target="#edit_profile">Edit Profile</button>
+  <div id="edit_profile" class="modal fade" role="dialog"
+    aria-labelledby="edit_modal_label" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="edit_modal_label">Update Information</h4>
+          <button type="button" class="close" data-dismiss="modal"
+          aria-label="Close"><span aria-hidden="true">×</span></button>
+        </div>
+        <div class="modal-body">
+          <div class="container-fluid">
+            <form action="{{ url_for('profile.profile') }}" method="POST"
+                  enctype=multipart/form-data>
+              <label>Personal Statement<br><em>
+                This will be visible to other users.</em></label>
+              <input type="text" class="form-control" value="{{ bio }}"
+                name="bio"><br>
+              <label>Profile Picture</label>
+              <input type=file name=file>
+              <br>
+              <input class="form-control" type="submit" value="Update">
+            </form>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+{% endblock %}

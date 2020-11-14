@@ -1,0 +1,80 @@
+
+match (n)<-[:TWEETED]-(m) with n match (n)-[:USED_TAG]->(k) return k
+
+match (n)-[c:TWEETED|LIKED]->(t:Tweet) where t.username="Ibra" return count(c)
+
+match (n)-[c:TWEETED|LIKED]->(t:Tweet) with t, count(c) as cc return t order by cc desc limit 2
+
+match (n)-[c:TWEETED|LIKED]->(t:Tweet) with t, c match (t)-[:USED_TAG]->(tag) return tag
+
+match (n)-[c:TWEETED|LIKED]->(t:Tweet) with t, count(c) as cc match (t)-[:USED_TAG]->(tag) return tag order by cc desc limit 1
+
+works maybe
+match (n:User)-[:FOLLOWS]->(:User)-[c:TWEETED|LIKED]->(t:Tweet)-[r:USED_TAG]->(tag:Hashtag) where n.username="Ibra" with tag, count(c) as cc order by cc desc limit 5 with tag match (n)-[:USED_TAG]->(tag) return n
+
+query 8: 5 most popular # based on tweets and likes
+match (n)-[c:TWEETED|LIKED]->(t:Tweet)-[:USED_TAG]->(tag:Hashtag) with tag, count(c) as cc return tag order by cc desc limit 1
+
+query 8: 5 most popular # based on tweets and likes, from users you are following {first step}
+match (n:User)-[:FOLLOWS]->(:User)-[c:TWEETED|LIKED]->(t:Tweet)-[r:USED_TAG]->(tag:Hashtag) where n.username="Ibra" with tag, count(c) as cc return tag order by cc desc limit 5
+
+
+Works: 'Ibra' must be replaced by any user.
+match (n:User)-[:FOLLOWS]->(:User)-[c:TWEETED|LIKED]->(t:Tweet)-[r:USED_TAG]->(tag:Hashtag) where n.username="Ibra" with tag, count(c) as cc order by cc desc limit 5 with tag match (n)-[:USED_TAG]->(tag) return n
+
+query 10
+match (n:User)-[:FOLLOWS]->(m:User)-[t:TWEETED]->(twts:Tweet)<-[r:LIKED]-(p) with twts, t, count(r) as rr return twts order by date(t.time), rr desc limit 1
+
+tweets made by person + tweets made by people person is following ordered by time
+match (m:User)-[:FOLLOWS]->(:User)-[t1:TWEETED]->(nn:Tweet), (mm:User)-[t2:TWEETED]->(n:Tweet) where m.username="we"and mm.username="we" return nn, n order by (t1.time), date(t2.time)  desc limit 2
+
+
+
+MAY WORK query 10
+match (m:User)-[:FOLLOWS]->(:User)-[t1:TWEETED]->(nn:Tweet) where m.username="we" return nn order by t1.time UNION match (nn:Tweet)<-[lk:LIKED]-(:User) return nn order by lk UNION match (m:User)-[t1:TWEETED]->(nn:Tweet) where m.username="we" return nn order by t1.time UNION match (nn:Tweet)<-[lk:LIKED]-(:User) return nn order by lk
+
+match (m:User)-[:FOLLOWS]->(:User)-[t1:TWEETED]->(nn:Tweet) where m.username="we" return nn order by t1.time desc UNION match (m:User)-[:FOLLOWS]->(:User)-[t1:TWEETED]->(nn:Tweet)<-[lk:LIKED]-(:User) where m.username="we" with nn, count(lk) as l, t1 return nn order by l, t1.time desc UNION match (m:User)-[t1:TWEETED]->(nn:Tweet) where m.username="we" return nn order by t1.time desc UNION match (m:User)-[:FOLLOWS]->(:User)-[t1:TWEETED]->(nn:Tweet)<-[lk:LIKED]-(:User) where m.username="we"  with nn, count(lk) as l, t1 return nn order by l, t1.time desc
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+to be added
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//top hashtags used by users you are following
+
+MATCH (:User {username:'jmout123'})-[:FOLLOWS]->(:User)-[:TWEETED]->(:Tweet)-[:USED_TAG]->(tag:Hashtag) 
+WITH tag, 
+SIZE((:Tweet)-[:USED_TAG]->(tag)) as num_used,
+SIZE((:User)-[:LIKED]->(:Tweet)-[:USED_TAG]->(tag)) as num_likes 
+ORDER BY num_likes DESC, num_used DESC
+RETURN tag, num_likes, num_used
+LIMIT 5
+
+//top hashtags globally
+
+MATCH (tag:Hashtag) 
+WITH tag, 
+SIZE((:Tweet)-[:USED_TAG]->(tag)) as num_used,
+SIZE((:User)-[:LIKED]->(:Tweet)-[:USED_TAG]->(tag)) as num_likes 
+ORDER BY num_likes DESC, num_used DESC
+RETURN tag, num_likes, num_used
+LIMIT 5
+
+// tweets of people you are following
+MATCH (:User {username:'jmout123'})-[:FOLLOWS]->(friend:User) 
+WITH COLLECT(friend.username) as friends
+MATCH (u:User)-[:TWEETED]->(t:Tweet)
+WHERE u.username = 'jmout123' OR u.username IN friends
+WITH t,
+SIZE((:User)-[:LIKED]->(t)) as num_likes,
+localdatetime.truncate("hour", localdatetime({ datetime:t.time })) as time
+ORDER BY time DESC, num_likes DESC
+RETURN t, time, num_likes
+
+
+
+returns 0 (no relationships) and 1 (already relationships) for retweets:
+MATCH (a)-[r:RETWEETED]->(b) WHERE a.username='Aisha' and b.id="5c7799dc-3075-440a-b319-04151319520c" return count(r) as torf
+
+returns 0 (no relationships) and 1 (already relationships) for likes:
+MATCH (a)-[r:LIKED]->(b) WHERE a.username='Aisha' and b.id="5c7799dc-3075-440a-b319-04151319520c" return count(r) as torf
+

@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}#{{ hashtag }}{% endblock %}
+
+{% block left %}
+  <h3><i class="fas fa-hashtag"></i>Trending </h3>
+  {% for tag in trending %}
+    <a href="/hashtags?hashtag={{tag['hashtag']}}">
+       <i class="fas fa-hashtag"></i>{{ tag['hashtag'] }}
+    </a>
+    <br>
+  {% endfor %}
+  {% if g.user %}
+  <hr>
+  <h3><i class="fas fa-hashtag"></i>People You Know Used </h3>
+  {% for tag in used_by_friends %}
+    <a href="/hashtags?hashtag={{tag['hashtag']}}" >
+       <i class="fas fa-hashtag"></i>{{ tag['hashtag'] }}
+    </a>
+    <br>
+  {% endfor %}
+  {% endif %}
+{% endblock %}
+
+{% block center %}
+<h3>Chirps</h3>
+<h4>featuring <i class="fas fa-hashtag"></i>{{ hashtag }}</h4>
+<hr>
+<div class="scrollable">
+  {% for tweet in tweets %}
+  <div class="tweet">
+    <p><strong>{{ tweet['body'] | safe }}</strong></p>
+    {% if g.user and tweet['username'] != g.user %}
+    <p><em>by @{{ tweet['username'] }} on {{ tweet['time'] }}</em></p>
+    {% elif g.user %}
+    <p><em>by you on {{ tweet['time'] }}</em></p>
+    {% endif %}
+    <ul>
+      <li>{{ tweet['likes'] }}
+        <i class="far fa-thumbs-up"></i></li>
+      <li>{{ tweet['retweets'] }}
+        <i class="fas fa-retweet"></i></li>
+    </ul>
+    <br>
+    <hr>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block right %}
+
+{% if g.user %}
+  <h3> <img src="{{ g.photo }}" alt="profile_pic" class = "avatar">  @{{ g.user }}</h3>
+  <hr>
+  <p>{{ g.bio }}</p>
+    <br><br>
+
+
+    <a href="#change_password" data-toggle="collapse">
+     Change Password
+  </a>
+  <br>
+
+  <div id="change_password" class="collapse">
+  <div class="card">
+    <div class="card-body">
+      <form action="{{ url_for('profile.profile') }}" method="POST">
+        <input type="password" name="new_password_1" class="form-control"
+          placeholder="New password" required><br>
+        <input type="password" name="new_password_2" class="form-control"
+          placeholder="Reenter Password" required><br>
+        <input class="btn btn-primary" type="submit" value="Update">
+      </form>
+    </div>
+  </div>
+  </div>
+
+  <hr>
+
+  <button type="button" class="btn btn-primary" data-toggle="modal"
+    data-target="#edit_profile">Edit Profile</button>
+  <div id="edit_profile" class="modal fade" role="dialog"
+    aria-labelledby="edit_modal_label" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="edit_modal_label">Update Information</h4>
+          <button type="button" class="close" data-dismiss="modal"
+          aria-label="Close"><span aria-hidden="true">×</span></button>
+        </div>
+        <div class="modal-body">
+          <div class="container-fluid">
+            <form action="{{ url_for('profile.profile') }}" method="POST"
+                  enctype=multipart/form-data>
+              <label>Personal Statement<br><em>
+                This will be visible to other users.</em></label>
+              <input type="text" class="form-control" value="{{ bio }}"
+                name="bio"><br>
+              <label>Profile Picture</label>
+              <input type=file name=file>
+              <br>
+              <input class="form-control" type="submit" value="Update">
+            </form>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+{% else %}
+<h3><i class="fas fa-angle-double-right"></i> Join Today</h3>
+<img class="avatar" src = "../static/icons/logo2.jpg">
+<h4>and stay up to date with the latest news and trends</h4>
+{% endif %}
+
+{% endblock %}

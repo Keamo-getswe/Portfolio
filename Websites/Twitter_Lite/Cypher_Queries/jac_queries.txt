@@ -1,0 +1,39 @@
+//top hashtags used by users you are following
+
+MATCH (:User {username:'jmout123'})-[:FOLLOWS]->(:User)-[:TWEETED]->(:Tweet)-[:USED_TAG]->(tag:Hashtag) 
+WITH tag, 
+SIZE((:Tweet)-[:USED_TAG]->(tag)) as num_used,
+SIZE((:User)-[:LIKED]->(:Tweet)-[:USED_TAG]->(tag)) as num_likes 
+ORDER BY num_likes DESC, num_used DESC
+RETURN tag, num_likes, num_used
+LIMIT 5
+
+//top hashtags globally
+
+MATCH (tag:Hashtag) 
+WITH tag, 
+SIZE((:Tweet)-[:USED_TAG]->(tag)) as num_used,
+SIZE((:User)-[:LIKED]->(:Tweet)-[:USED_TAG]->(tag)) as num_likes 
+ORDER BY num_likes DESC, num_used DESC
+RETURN tag, num_likes, num_used
+LIMIT 5
+
+// tweets of people you are following
+MATCH (:User {username:'jmout123'})-[:FOLLOWS]->(friend:User) 
+WITH COLLECT(friend.username) as friends
+MATCH (u:User)-[:TWEETED]->(t:Tweet)
+WHERE u.username = 'jmout123' OR u.username IN friends
+WITH t,
+SIZE((:User)-[:LIKED]->(t)) as num_likes,
+date(t.time) as time
+ORDER BY time DESC, num_likes DESC
+RETURN t, time, num_likes
+
+//suggesions of people to follow
+MATCH (user:User {username:'jmout123'})-[:FOLLOWS*2]->(foaf:User)
+WHERE NOT((user)-[:FOLLOWS]->(foaf)) AND NOT foaf.username = 'jmout123'
+WITH foaf,
+SIZE((foaf)-[:TWEETED]->(:Tweet)<-[:LIKED]-(:User)) as num_likes,
+SIZE((foaf)-[:TWEETED]->(:Tweet)) as num_tweets
+ORDER BY num_likes DESC, num_tweets DESC
+RETURN foaf, num_likes, num_tweets
